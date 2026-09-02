@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yuki Player</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+      padding: 18px 20px;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .search {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 15px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background: #222;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #777;
+    }
+
+    button {
+      padding: 15px 24px;
+      border: none;
+      border-radius: 10px;
+      background: #fff;
+      color: #111;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .info {
+      margin-top: 15px;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .search {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  🎬 Yuki Player
+</header>
+
+<main>
+
+  <div class="search">
+    <input
+      id="url"
+      type="text"
+      placeholder="YouTubeのURLを貼り付け"
+      autocomplete="off"
+    >
+
+    <button onclick="playVideo()">再生</button>
+  </div>
+
+  <div class="player">
+    <iframe
+      id="player"
+      src=""
+      allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <div class="info">
+    YouTubeのURLを貼り付けて「再生」を押してください。
+  </div>
+
+</main>
+
+<script>
+function getVideoId(url) {
+  try {
+    const u = new URL(url);
+
+    // https://www.youtube.com/watch?v=XXXXXXXXXXX
+    if (
+      u.hostname === "youtube.com" ||
+      u.hostname === "www.youtube.com" ||
+      u.hostname.endsWith(".youtube.com")
+    ) {
+      return u.searchParams.get("v");
+    }
+
+    // https://youtu.be/XXXXXXXXXXX
+    if (
+      u.hostname === "youtu.be" ||
+      u.hostname === "www.youtu.be"
+    ) {
+      return u.pathname.substring(1).split("/")[0];
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function playVideo() {
+  const input = document.getElementById("url");
+  const player = document.getElementById("player");
+
+  const videoId = getVideoId(input.value.trim());
+
+  if (!videoId) {
+    alert("YouTubeのURLを入力してください。");
+    return;
+  }
+
+  player.src =
+    "https://www.youtube.com/embed/" +
+    encodeURIComponent(videoId) +
+    "?playsinline=1&rel=0";
+}
+
+// Enterキーでも再生
+document.getElementById("url").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    playVideo();
+  }
+});
+</script>
+
+</body>
+</html>
